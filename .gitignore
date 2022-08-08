@@ -1,5 +1,7 @@
 *.class
 
-./*/.venv/*
+./**/.venv/*
 
 .venv/*
+
+**/*.class
