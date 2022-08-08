@@ -2,7 +2,7 @@ import os
 import numpy
 import matplotlib.pyplot as plt
 
-sample_size = 10
+sample_size = 100
 
 
 prob_ = [x/100 for x in range(1,96)]
