@@ -16,12 +16,12 @@ time_taken_average_width = [0]*len(width_)
 
 def collect_data(pth_to_folder):
     os.chdir(pth_to_folder)
-    compile_arg = "javac " + pth_to_folder + "Assignment-0.java"
+    compile_arg = "javac " + pth_to_folder + "Main.java"
     os.system(compile_arg)
 
     for i in range(sample_size):
         path_to_class = pth_to_folder + "Main" 
-        run_arg = "java " + pth_to_folder + "Assignment-0.java"
+        run_arg = "java " + pth_to_folder + "Main.java"
 
         os.system(run_arg)
 
