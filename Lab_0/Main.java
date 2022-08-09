@@ -45,7 +45,7 @@ class Main {
             int width = 500; // Width of the border
             double p_ON = 0.01; // Probability that the sensor will be ON for next 10 seconds
             FileWriter myWriter = new FileWriter("probability.txt");
-            while (p_ON != 0.96) {
+            while (p_ON <= 0.90) {
                 int time_taken = S.simulate(width, p_ON);
                 myWriter.append(String.valueOf(p_ON) + " ");
                 myWriter.append(String.valueOf(time_taken) + "\n");
@@ -64,7 +64,7 @@ class Main {
             double p_ON = 0.5;
             int width = 10;
             FileWriter myWriter = new FileWriter("width.txt");
-            while (width != 500) {
+            while (width != 1000) {
                 int time_taken = S.simulate(width, p_ON);
                 myWriter.append(String.valueOf(width) + " ");
                 myWriter.append(String.valueOf(Math.round(time_taken)) + "\n");

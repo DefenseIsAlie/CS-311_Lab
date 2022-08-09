@@ -26,8 +26,19 @@ public class Simulator {
             boolean condition_1 = B.border[I.y + 1][I.x - 1] == 0;
             boolean condition_2 = B.border[I.y + 1][I.x + 1] == 0;
             boolean condition_3 = B.border[I.y + 1][I.x] == 0;
-            if (condition_1 || condition_2 || condition_3) {
-                I.y++; // move forward
+            if (I.y == 0) { // Infiltration has to not yet entered the border
+                if (condition_1 || condition_2 || condition_3) {
+                    I.y++; // move forward
+                }
+            } else {
+                // Infiltrator has already entered the border
+                boolean condition_4 = B.border[I.y][I.x] == 0; // Current position of the infiltrator
+                if (condition_4) { // He can move to other safe cells only if the current cell has its sensor in
+                                   // OFF state
+                    if (condition_1 || condition_2 || condition_3) {
+                        I.y++; // move forward
+                    }
+                }
             }
             // if all the conditions are false he chooses to remain at the same position
             T.time += 10;
