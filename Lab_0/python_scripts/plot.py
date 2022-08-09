@@ -52,6 +52,9 @@ def plot_data():
 
     plt.plot(prob_, time_taken_average_prob)
     plt.scatter(prob_, time_taken_average_prob)
+    plt.xlabel("Probability")
+    plt.ylabel("Averge time taken")
+    # Width = 500 sample size
     plt.savefig("probvstime")
     plt.show()
 
@@ -59,6 +62,9 @@ def plot_data():
 
     plt.plot(width_, time_taken_average_width)
     plt.scatter(width_, time_taken_average_width)
+    # P_On = 0.5 sample_size
+    plt.xlabel("Width")
+    plt.ylabel("Average time taken")
     plt.show()
     plt.savefig("widthvstime")
 
