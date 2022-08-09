@@ -13,26 +13,16 @@ class Main {
         // Creating probability.txt if not exists
         try {
             File myObj = new File("probability.txt");
-            if (myObj.createNewFile()) {
-                System.out.println("File created: " + myObj.getName());
-            } else {
-                System.out.println(myObj.getName() + " already exists.");
-            }
+            myObj.createNewFile();
         } catch (IOException e) {
-            System.out.println("An error occurred.");
             e.printStackTrace();
         }
 
         // Creating width.txt if not exists
         try {
             File myObj = new File("width.txt");
-            if (myObj.createNewFile()) {
-                System.out.println("File created: " + myObj.getName());
-            } else {
-                System.out.println(myObj.getName() + " already exists.");
-            }
+            myObj.createNewFile();
         } catch (IOException e) {
-            System.out.println("An error occurred.");
             e.printStackTrace();
         }
 
@@ -53,7 +43,6 @@ class Main {
                 p_ON = H.roundTo2(p_ON);
             }
             myWriter.close();
-            System.out.println("Successfully wrote into the probability.txt");
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
@@ -71,7 +60,6 @@ class Main {
                 width += 10;
             }
             myWriter.close();
-            System.out.println("Successfully wrote into the width.txt.");
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
