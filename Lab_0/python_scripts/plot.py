@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 sample_size = 0
 
 if __name__ == "__main__":
-    sample_size = 20
+    sample_size = 50
 else:
-    sample_size = 1
+    sample_size = 10
 
 
 prob_ = [x/100 for x in range(1, 91)]
@@ -46,9 +46,9 @@ def collect_data(pth_to_folder):
 
 def plot_data():
     time_taken_average_prob = numpy.asarray(time_taken_sum_prob)
-    time_taken_average_prob * (1 / sample_size)
+    time_taken_average_prob = time_taken_average_prob * (1 / sample_size)
     time_taken_average_width = numpy.asarray(time_taken_sum_width)
-    time_taken_average_width * (1 / sample_size)
+    time_taken_average_width = time_taken_average_width * (1 / sample_size)
 
     plt.plot(prob_, time_taken_average_prob)
     plt.scatter(prob_, time_taken_average_prob)
