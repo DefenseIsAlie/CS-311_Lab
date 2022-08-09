@@ -7,7 +7,7 @@ sample_size = 0
 if __name__ == "__main__":
     sample_size = 20
 else:
-    sample_size = 3
+    sample_size = 1
 
 
 prob_ = [x/100 for x in range(1, 91)]
@@ -52,6 +52,7 @@ def plot_data():
 
     plt.plot(prob_, time_taken_average_prob)
     plt.scatter(prob_, time_taken_average_prob)
+    plt.title("Probability vs Time")
     plt.xlabel("Probability")
     plt.ylabel("Averge time taken")
     # Width = 500 sample size
@@ -63,6 +64,7 @@ def plot_data():
     plt.plot(width_, time_taken_average_width)
     plt.scatter(width_, time_taken_average_width)
     # P_On = 0.5 sample_size
+    plt.title("Width vs Time")
     plt.xlabel("Width")
     plt.ylabel("Average time taken")
     plt.show()
