@@ -18,10 +18,15 @@ public class Simulator {
 
         // keep on iterating until we reach the end of the border
         while (I.y != width) {
-            for (int i = 1; i <= width; i++) {
+            if (I.y == 0) { // Infiltration has to not yet entered the border
                 for (int j = 0; j < 3; j++) {
-                    B.border[i][j] = H.getSensorState(p_ON);
+                    B.border[I.y + 1][j] = H.getSensorState(p_ON);
                 }
+            } else { // Infiltrator has already entered the border
+                for (int j = 0; j < 3; j++) {
+                    B.border[I.y + 1][j] = H.getSensorState(p_ON);
+                }
+                B.border[I.y][I.x] = H.getSensorState(p_ON); // current position
             }
             boolean condition_1 = B.border[I.y + 1][I.x - 1] == 0;
             boolean condition_2 = B.border[I.y + 1][I.x + 1] == 0;
