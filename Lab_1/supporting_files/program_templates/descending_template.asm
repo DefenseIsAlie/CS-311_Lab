@@ -37,4 +37,6 @@ swap:
 	store %x10, 0, %x8
 	jmp steploop
 exitsuccess:
+	load %x0, $n, %x17
+	store %x0, 0, %x17
 	end
