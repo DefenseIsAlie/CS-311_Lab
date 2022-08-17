@@ -15,8 +15,8 @@ main:
 	load %x0, $n, %x30
 	subi %x30, 1, %x30
 	subi %30, 1, %x29
-	sub %x0, 1, %x15
-	sub %x0, 1, %x3
+	subi %x0, 1, %x15
+	subi %x0, 1, %x3
 	jmp mainloop
 mainloop:
 	beq %x30, %x15, exitsuccess
@@ -33,8 +33,8 @@ steploop:
 	blt  %x10, %x11, swap
 	jmp steploop
 swap:
-	store %x3, 10, %x3
-	store %x4, 10, %x4
+	store %x11, 0, %x7
+	store %x10, 0, %x8
 	jmp steploop
 exitsuccess:
 	end
