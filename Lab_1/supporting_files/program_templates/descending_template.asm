@@ -12,31 +12,31 @@ n:
 	8
 	.text
 main:
-	load %x0, $n, %x30
-	subi %x30, 1, %x30
-	subi %30, 1, %x29
-	subi %x0, 1, %x15
-	subi %x0, 1, %x3
-	jmp mainloop
-mainloop:
-	beq %x30, %x15, exitsuccess
-	addi %x15, 1, %x15
-	jmp steploop
-steploop:
-	beq %x29, %x3, mainloop
-	addi %x3, 1, %x3
-	addi %x3, 1, %x4
-	load %x3, $a, %x10
-	addi %x3, $a, %x7
-	load %x4, $a, %x11
-	addi %x4, $a, %x8
-	blt  %x10, %x11, swap
-	jmp steploop
+	load %x0, $n, %x3
+	add %x0, %x0, %x4
+	add %x0, %x0, %x5
+	addi %x0, 0, %x10
+firstloop:
+	beq %x4, %x3, exit
+	jmp secondloop
+continuefirstloop:
+	add %x0, %x0, %x5
+	addi %x4, 1, %x4
+	jmp firstloop
+secondloop:
+	beq %x5, %x3, continuefirstloop
+	load %x5, $a, %x6
+	addi %x5, 1, %x7
+	load %x7, $a, %x8
+	bgt %x8, %x6, swap
+continuesecondloop:
+	addi %x5, 1, %x5
+	jmp secondloop
 swap:
-	store %x11, 0, %x7
-	store %x10, 0, %x8
-	jmp steploop
-exitsuccess:
-	load %x0, $n, %x17
-	store %x0, 0, %x17
+	addi %x5, $a, %x20
+	addi %x7, $a, %x21
+	store %x8, 0, %x20
+	store %x6, 0, %x21
+	jmp continuesecondloop
+exit:
 	end
