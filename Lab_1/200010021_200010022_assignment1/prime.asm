@@ -17,7 +17,7 @@ loop:
 	div %x3, %x4, %x6 
 	mul %x6, %x4, %x7
 	sub %x3, %x7, %x8
-	beq %x8, 0, notprime
+	beq %x8, %x0, notprime
 	addi %x4, 1, %x4
 	jmp loop
 prime:
