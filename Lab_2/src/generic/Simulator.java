@@ -1,63 +1,37 @@
 package generic;
 
-import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import generic.Operand.OperandType;
+
+
+class helperFunctions {
+
+    public String convert_to_binary_str_len_n(int N, int len) {
+        String bin = String.format("%" + len + "s", Integer.toBinaryString(N)).replace(' ', '0');
+        return bin;
+    }
+
+
+    public String convert_opd_to_binary_str(Operand OPD, int precision) {
+        if (OPD == null) {
+            return convert_to_binary_str_len_n(0, precision);
+        }
+        if (OPD.getOperandType() == Operand.OperandType.Label) {
+            // if operand is a label
+            return convert_to_binary_str_len_n(ParsedProgram.symtab.get(OPD.getLabelValue()), precision);
+        }
+        // if operand is a resistor or a immediate
+        return convert_to_binary_str_len_n(OPD.getValue(), precision);
+    }
+
+}
 
 public class Simulator {
-	
-	//Helper Function Class
-	public static class helperFunctions {
-
-		public String toBinaryOfSpecificPrecision(int N, int len) {
-			String bin = String.format("%" + len + "s", Integer.toBinaryString(N)).replace(' ', '0');
-			return bin;
-		}
-
-		public int toSignedInteger(String bin) {
-			int leftOver = 32 - bin.length();
-			char[] signedPrefix = new char[leftOver];
-			//fill 0 in the prefix if MSB in bin is 0 ELSE fill 1 in the prefix if MSB in bin is 1
-			Arrays.fill(signedPrefix, bin.charAt(0));
-			int resultantSignInt = (int) Long.parseLong(new String(signedPrefix)+ bin, 2);
-			return resultantSignInt;
-		}
-
-		public String toBinaryString(int N) {
-			ArrayList<Integer> binBits = new ArrayList<Integer>();
-			while (N > 0) {
-				binBits.add(N % 2);
-				N /= 2;
-			}
-			StringBuilder binForm = new StringBuilder();
-			//Iterating in reverse order will give us the correct binary form
-			for (int i = binBits.size() - 1; i >= 0; i--) {
-				binForm.append(binBits.get(i));
-			}
-			return " " + binForm.toString();
-		}
-
-		public String convert(Operand OPD, int precision) {
-			if (OPD == null) {
-				return toBinaryOfSpecificPrecision(0, precision);
-			}
-			if (OPD.getOperandType() == Operand.OperandType.Label) {
-				// if operand is a label
-				return toBinaryOfSpecificPrecision(ParsedProgram.symtab.get(OPD.getLabelValue()), precision);
-			}
-			// if operand is a resistor or a immediate
-			return toBinaryOfSpecificPrecision(OPD.getValue(), precision);
-		}
-
-	}
 
 	static FileInputStream inputcodeStream = null;
 	
@@ -105,73 +79,98 @@ public class Simulator {
 
 	    helperFunctions helper = new helperFunctions();
 
-	    FileOutputStream file;
+	    
         try {
             //1. open the objectProgramFile in binary mode
-            file = new FileOutputStream(objectProgramFile);
-            BufferedOutputStream bfile = new BufferedOutputStream(file);
+            FileOutputStream output_binary_file = new FileOutputStream(objectProgramFile);
 
             //2. write the firstCodeAddress to the file
             byte[] addressCode = ByteBuffer.allocate(4).putInt(ParsedProgram.firstCodeAddress).array();
-            bfile.write(addressCode);
+            output_binary_file.write(addressCode);
 
             //3. write the data to the file
             for (int value: ParsedProgram.data) {
                 byte[] dataValue = ByteBuffer.allocate(4).putInt(value).array();
-                bfile.write(dataValue);
+                output_binary_file.write(dataValue);
             }
 
             //4. assemble one instruction at a time, and write to the file
             for (Instruction inst: ParsedProgram.code) {
-                String binaryRep = "";
-                binaryRep += OPCODE.get(inst.getOperationType());
-                int opCode = Integer.parseInt(binaryRep, 2);
+                String inst_to_binary_format = "";
+                inst_to_binary_format += OPCODE.get(inst.getOperationType());
+                int opCode = Integer.parseInt(inst_to_binary_format, 2);
                 int pc = inst.getProgramCounter();
-                
-                if (opCode <= 20 && opCode % 2 == 0) {
-                    // R3 Type
-                    binaryRep += helper.convert(inst.getSourceOperand1(), 5);
-                    binaryRep += helper.convert(inst.getSourceOperand2(), 5);
-                    binaryRep += helper.convert(inst.getDestinationOperand(), 5);
-                    binaryRep += helper.toBinaryOfSpecificPrecision(0, 12);
+
+                int by_Instruction_type = 0;
+
+                if (opCode == 24){
+                    by_Instruction_type = 1;
+                } else if (opCode <= 20 && opCode % 2 == 0 ) {                    
+                    by_Instruction_type = 2;
+                } else if (opCode == 29) {
+                    by_Instruction_type = 3;
+                } else if (opCode >= 25 && opCode <= 28) {
+                    by_Instruction_type = 4;
+                } else {
+                    by_Instruction_type = 5;
                 }
-                else if (opCode == 24) {
-                    // RI Type
+
+                switch (by_Instruction_type) {
+                    case 1:
                     if (inst.destinationOperand.getOperandType() == Operand.OperandType.Register) {
-                        binaryRep += helper.convert(inst.getDestinationOperand(), 5);
-                        binaryRep += helper.toBinaryOfSpecificPrecision(0, 22);
+                        inst_to_binary_format += helper.convert_opd_to_binary_str(inst.getDestinationOperand(), 5);
+                        inst_to_binary_format += helper.convert_to_binary_str_len_n(0, 22);
                     }
                     else {						
-                        binaryRep += helper.toBinaryOfSpecificPrecision(0, 5);
-                        int value = Integer.parseInt(helper.convert(inst.getDestinationOperand(), 5), 2) - pc;
-                        String bin = helper.toBinaryOfSpecificPrecision(value, 22);
-                        binaryRep += bin.substring(bin.length() - 22);
+                        inst_to_binary_format += helper.convert_to_binary_str_len_n(0, 5);
+                        int value = Integer.parseInt(helper.convert_opd_to_binary_str(inst.getDestinationOperand(), 5), 2) - pc;
+                        String bin = helper.convert_to_binary_str_len_n(value, 22);
+                        inst_to_binary_format += bin.substring(bin.length() - 22);
                     }
+
+                    break;
+
+                    case 2:
+                    inst_to_binary_format += helper.convert_opd_to_binary_str(inst.getSourceOperand1(), 5);
+                    inst_to_binary_format += helper.convert_opd_to_binary_str(inst.getSourceOperand2(), 5);
+                    inst_to_binary_format += helper.convert_opd_to_binary_str(inst.getDestinationOperand(), 5);
+                    inst_to_binary_format += helper.convert_to_binary_str_len_n(0, 12);
+                        
+                    break;
+
+                    case 3:
+                    inst_to_binary_format += helper.convert_to_binary_str_len_n(0, 27);
+
+                    break;
+
+                    case 4:
+                    int value = Integer.parseInt(helper.convert_opd_to_binary_str(inst.getDestinationOperand(), 5), 2) - pc;
+                    inst_to_binary_format += helper.convert_opd_to_binary_str(inst.getSourceOperand1(), 5);
+                    inst_to_binary_format += helper.convert_opd_to_binary_str(inst.getSourceOperand2(), 5);
+                    String bin = helper.convert_to_binary_str_len_n(value, 17);
+                    inst_to_binary_format += bin.substring(bin.length() - 17);
+
+                    break;
+
+                    case 5:
+                    inst_to_binary_format += helper.convert_opd_to_binary_str(inst.getSourceOperand1(), 5);
+                    inst_to_binary_format += helper.convert_opd_to_binary_str(inst.getDestinationOperand(), 5);
+                    inst_to_binary_format += helper.convert_opd_to_binary_str(inst.getSourceOperand2(), 17);
+
+                    break;
+                
+                    default:
+                        break;
                 }
-                else if (opCode == 29) {
-                    binaryRep += helper.toBinaryOfSpecificPrecision(0, 27);
-                }
-                else {
-                    // R2I Type
-                    if (opCode >= 25 && opCode <= 28) {
-                        int value = Integer.parseInt(helper.convert(inst.getDestinationOperand(), 5), 2) - pc;
-                        binaryRep += helper.convert(inst.getSourceOperand1(), 5);
-                        binaryRep += helper.convert(inst.getSourceOperand2(), 5);
-                        String bin = helper.toBinaryOfSpecificPrecision(value, 17);
-                        binaryRep += bin.substring(bin.length() - 17);
-                    }
-                    else {						
-                        binaryRep += helper.convert(inst.getSourceOperand1(), 5);
-                        binaryRep += helper.convert(inst.getDestinationOperand(), 5);
-                        binaryRep += helper.convert(inst.getSourceOperand2(), 17);
-                    }
-                }
-                int instInteger = (int) Long.parseLong(binaryRep, 2);
+
+                
+                int instInteger = (int) Long.parseLong(inst_to_binary_format, 2);
                 byte[] instBinary = ByteBuffer.allocate(4).putInt(instInteger).array();
-                bfile.write(instBinary);
+
+                output_binary_file.write(instBinary);
             }
             //5. close the file
-            bfile.close();
+            output_binary_file.close();
         } catch (IOException e) {
             e.printStackTrace();
         } 
