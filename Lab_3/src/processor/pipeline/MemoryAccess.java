@@ -1,5 +1,7 @@
 package processor.pipeline;
 
+import generic.Instruction;
+import generic.Instruction.OperationType;
 import processor.Processor;
 
 public class MemoryAccess {
@@ -16,7 +18,33 @@ public class MemoryAccess {
 	
 	public void performMA()
 	{
-		//TODO
+		if (EX_MA_Latch.isMA_enable()) {
+			Instruction I = EX_MA_Latch.getInstruction();
+			int ALU_result = EX_MA_Latch.getALU_result();
+			OperationType OP = I.getOperationType();
+
+			if (OP == OperationType.store) {
+				// address is the memory address at which a value is to be stored
+				// data is the value which is to be stored (op2 which is equivalent to rd) 
+				int address = ALU_result; 
+				int data = containingProcessor.getRegisterFile().getValue(I.getSourceOperand2().getValue());
+
+				// after retrieving the value and address, store it in the memory
+				containingProcessor.getMainMemory().setWord(address, data);
+			} else if (OP == OperationType.load) {
+				/* get the value which is to be stored in either (ra, rd) from the main memory at ALU_result location and store in loadResult */
+				int loadResult = containingProcessor.getMainMemory().getWord(ALU_result);
+				MA_RW_Latch.setLoadResult(loadResult);
+			}
+
+			// store the necessary info regarding an instruction in MA_RW_Latch
+			MA_RW_Latch.setInstruction(I);
+			MA_RW_Latch.setALU_result(ALU_result);
+
+			// set Register Write stage as enable and Memory Access stage as disable
+			MA_RW_Latch.setRW_enable(true);
+			EX_MA_Latch.setMA_enable(false);
+		}
 	}
 
 }
