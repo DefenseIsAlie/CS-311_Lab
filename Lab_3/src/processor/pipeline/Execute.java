@@ -1,11 +1,12 @@
 package processor.pipeline;
 
+import processor.Processor;
+
 import java.util.Arrays;
 
 import generic.Instruction;
 import generic.Instruction.OperationType;
 import generic.Operand.OperandType;
-import processor.Processor;
 
 public class Execute {
 	Processor containingProcessor;
@@ -13,121 +14,119 @@ public class Execute {
 	EX_MA_LatchType EX_MA_Latch;
 	EX_IF_LatchType EX_IF_Latch;
 	
-	public Execute(Processor containingProcessor, OF_EX_LatchType oF_EX_Latch, EX_MA_LatchType eX_MA_Latch, EX_IF_LatchType eX_IF_Latch)
-	{
+	public Execute(Processor containingProcessor, OF_EX_LatchType oF_EX_Latch, EX_MA_LatchType eX_MA_Latch, EX_IF_LatchType eX_IF_Latch){
 		this.containingProcessor = containingProcessor;
 		this.OF_EX_Latch = oF_EX_Latch;
 		this.EX_MA_Latch = eX_MA_Latch;
 		this.EX_IF_Latch = eX_IF_Latch;
 	}
 	
-	public void performEX()
-	{
-		if (OF_EX_Latch.isEX_enable()) {
-			Instruction I = OF_EX_Latch.getInstruction();
-			EX_MA_Latch.setInstrucion(I);
-			OperationType OP = I.getOperationType();
-
-			int opcode = Arrays.asList(OperationType.values()).indexOf(OP);
+	public void performEX(){
+		if(OF_EX_Latch.isEX_enable()){
+			Instruction instruction = OF_EX_Latch.getInstruction();
+			System.out.println(instruction);
+			EX_MA_Latch.setInstruction(instruction);
+			OperationType op_type = instruction.getOperationType();
+			int opcode = Arrays.asList(OperationType.values()).indexOf(op_type);
 			int currentPC = containingProcessor.getRegisterFile().getProgramCounter() - 1;
-			int ALU_result = 0;
 
+			int alu_result = 0;
 
 			if(opcode % 2 == 0 && opcode < 21){
 				int op1 = containingProcessor.getRegisterFile().getValue(
-					I.getSourceOperand1().getValue());
+					instruction.getSourceOperand1().getValue());
 				int op2 = containingProcessor.getRegisterFile().getValue(
-					I.getSourceOperand2().getValue());
+					instruction.getSourceOperand2().getValue());
 
-				switch(OP){
+				switch(op_type){
 					case add:
-						ALU_result = op1 + op2;
+						alu_result = op1 + op2;
 						break;
 					case sub:
-						ALU_result = op1 - op2;
+						alu_result = op1 - op2;
 						break;
 					case mul:
-						ALU_result = op1 * op2;
+						alu_result = op1 * op2;
 						break;
 					case div:
-						ALU_result = op1 / op2;
-						int modulo = op1 % op2;
-						containingProcessor.getRegisterFile().setValue(31, modulo);
+						alu_result = op1 / op2;
+						int remainder = op1 % op2;
+						containingProcessor.getRegisterFile().setValue(31, remainder);
 						break;
 					case and:
-						ALU_result = op1 & op2;
+						alu_result = op1 & op2;
 						break;
 					case or:
-						ALU_result = op1 | op2;
+						alu_result = op1 | op2;
 						break;
 					case xor:
-						ALU_result = op1 ^ op2;
+						alu_result = op1 ^ op2;
 						break;
 					case slt:
 						if(op1 < op2)
-							ALU_result = 1;
+							alu_result = 1;
 						else
-							ALU_result = 0;
+							alu_result = 0;
 						break;
 					case sll:
-						ALU_result = op1 << op2;
+						alu_result = op1 << op2;
 						break;
 					case srl:
-						ALU_result = op1 >>> op2;
+						alu_result = op1 >>> op2;
 						break;
 					case sra:
-						ALU_result = op1 >> op2;
+						alu_result = op1 >> op2;
 						break;
 					default:
 						break;
 				}
 			}
 			else if(opcode < 23){
-				int i = I.getSourceOperand1().getValue();
+				int i = instruction.getSourceOperand1().getValue();
 				int op1 = containingProcessor.getRegisterFile().getValue(i);
-				int op2 = I.getSourceOperand2().getValue();
+				int op2 = instruction.getSourceOperand2().getValue();
 
-				switch(OP){
+				switch(op_type){
 					case addi:
-						ALU_result = op1 + op2;
+						alu_result = op1 + op2;
 						break;
 					case subi:
-						ALU_result = op1 - op2;
+						alu_result = op1 - op2;
 						break;
 					case muli:
-						ALU_result = op1 * op2;
+						alu_result = op1 * op2;
 						break;
 					case divi:
-						ALU_result = op1 / op2;
-						int modulo = op1 % op2;
-						containingProcessor.getRegisterFile().setValue(31, modulo);
+						alu_result = op1 / op2;
+						int remainder = op1 % op2;
+						containingProcessor.getRegisterFile().setValue(31, remainder);
 						break;
 					case andi:
-						ALU_result = op1 & op2;
+						alu_result = op1 & op2;
 						break;
 					case ori:
-						ALU_result = op1 | op2;
+						alu_result = op1 | op2;
 						break;
 					case xori:
-						ALU_result = op1 ^ op2;
+						alu_result = op1 ^ op2;
 						break;
 					case slti:
 						if(op1 < op2)
-							ALU_result = 1;
+							alu_result = 1;
 						else
-							ALU_result = 0;
+							alu_result = 0;
 						break;
 					case slli:
-						ALU_result = op1 << op2;
+						alu_result = op1 << op2;
 						break;
 					case srli:
-						ALU_result = op1 >>> op2;
+						alu_result = op1 >>> op2;
 						break;
 					case srai:
-						ALU_result = op1 >> op2;
+						alu_result = op1 >> op2;
 						break;
 					case load:
-						ALU_result = op1 + op2;
+						alu_result = op1 + op2;
 						break;
 					default:
 						break;
@@ -135,66 +134,65 @@ public class Execute {
 			}
 			else if(opcode == 23){
 				int op1 = containingProcessor.getRegisterFile().getValue(
-				I.getDestinationOperand().getValue());
-				int op2 = I.getSourceOperand2().getValue();
-				ALU_result = op1 + op2;
+					instruction.getDestinationOperand().getValue());
+				int op2 = instruction.getSourceOperand2().getValue();
+				alu_result = op1 + op2;
 			}
 			else if(opcode == 24){
-				OperandType optype = I.getDestinationOperand().getOperandType();
+				OperandType optype = instruction.getDestinationOperand().getOperandType();
 				int imm = 0;
 				if (optype == OperandType.Register){
 					imm = containingProcessor.getRegisterFile().getValue(
-					I.getDestinationOperand().getValue());
+						instruction.getDestinationOperand().getValue());
 				}
 				else{
-					imm = I.getDestinationOperand().getValue();
+					imm = instruction.getDestinationOperand().getValue();
 				}
-				ALU_result = imm + currentPC;
-				EX_IF_Latch.setIsBranchEnable(true);
-				EX_IF_Latch.setPC(ALU_result);
+				alu_result = imm + currentPC;
+				EX_IF_Latch.setIS_enable(true, alu_result);
 			}
 			else if(opcode < 29){
 				int op1 = containingProcessor.getRegisterFile().getValue(
-					I.getSourceOperand1().getValue());
+					instruction.getSourceOperand1().getValue());
 				int op2 = containingProcessor.getRegisterFile().getValue(
-					I.getSourceOperand2().getValue());
-				int imm = I.getDestinationOperand().getValue();
-				switch(OP){
+					instruction.getSourceOperand2().getValue());
+				int imm = instruction.getDestinationOperand().getValue();
+				switch(op_type){
 					case beq:
 						if(op1 == op2){
-							ALU_result = imm + currentPC;
-							EX_IF_Latch.setIsBranchEnable(true);
-							EX_IF_Latch.setPC(ALU_result);
+							alu_result = imm + currentPC;
+							EX_IF_Latch.setIS_enable(true, alu_result);
 						}
 						break;
 					case bne:
 						if(op1 != op2){
-							ALU_result = imm + currentPC;
-							EX_IF_Latch.setIsBranchEnable(true);
-							EX_IF_Latch.setPC(ALU_result);
+							alu_result = imm + currentPC;
+							EX_IF_Latch.setIS_enable(true, alu_result);
 						}
 
 						break;
 					case blt:
 						if(op1 < op2){
-							ALU_result = imm + currentPC;
-							EX_IF_Latch.setIsBranchEnable(true);
-							EX_IF_Latch.setPC(ALU_result);
+							alu_result = imm + currentPC;
+							EX_IF_Latch.setIS_enable(true, alu_result);
 						}
 						break;
 					case bgt:
 						if(op1 > op2){
-							ALU_result = imm + currentPC;
-							EX_IF_Latch.setIsBranchEnable(true);
-							EX_IF_Latch.setPC(ALU_result);
+							alu_result = imm + currentPC;
+							EX_IF_Latch.setIS_enable(true, alu_result);
 						}
 						break;
 					default:
 						break;
 				}
 			}
-			EX_MA_Latch.setALU_result(ALU_result);
+			System.out.println("alu_result" + Integer.toString(alu_result));
+			EX_MA_Latch.setALU_result(alu_result);
 		}
+
+		OF_EX_Latch.setEX_enable(false);
+		EX_MA_Latch.setMA_enable(true);
 	}
 
 }

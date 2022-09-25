@@ -8,69 +8,69 @@ import java.io.InputStream;
 
 import processor.Clock;
 import processor.Processor;
+import generic.Statistics;
 
 public class Simulator {
 		
 	static Processor processor;
 	static boolean simulationComplete;
 	
-	public static void setupSimulation(String assemblyProgramFile, Processor p)
-	{
+	public static void setupSimulation(String assemblyProgramFile, Processor p){
 		Simulator.processor = p;
-		try {
+		try{
 			loadProgram(assemblyProgramFile);
-		} catch (Exception e) {
+		} 
+		catch (IOException e){
 			e.printStackTrace();
 		}
+		
 		simulationComplete = false;
 	}
 	
-	static void loadProgram(String assemblyProgramFile) throws IOException
-	{
-		InputStream input = null;
-		try {
-			input = new FileInputStream(assemblyProgramFile);
-		} catch(FileNotFoundException e) {
+	static void loadProgram(String assemblyProgramFile) throws IOException{
+		/*
+		 * TODO
+		 * 1. load the program into memory according to the program layout described
+		 *    in the ISA specification
+		 * 2. set PC to the address of the first instruction in the main
+		 * 3. set the following registers:
+		 *     x0 = 0
+		 *     x1 = 65535
+		 *     x2 = 65535
+		 */
+		InputStream is = null;
+		try{
+			is = new FileInputStream(assemblyProgramFile);
+		}
+		catch (FileNotFoundException e){
 			e.printStackTrace();
 		}
+		
+		DataInputStream d_is = new DataInputStream(is);
 
-		DataInputStream binaryDataInput = new DataInputStream(input);
-		int currentAdress = 0;
-
-		Boolean isPC = true;
-
-		/*
-		1. Load the program into memory according to the program layout described in the ISA specification
-		*/
-		while (binaryDataInput.available() > 0) {
-			int currentMemoryContent = binaryDataInput.readInt();
-			if (isPC) {
-				/*
-				2. set PC to the address of the first instruction in the main memory 
-				*/
-				processor.getRegisterFile().setProgramCounter(currentMemoryContent);
-				isPC = false;
-				continue;
+		int address = -1;
+		while(d_is.available() > 0){
+			int next = d_is.readInt();
+			if(address == -1){
+				processor.getRegisterFile().setProgramCounter(next);
 			}
-			processor.getMainMemory().setWord(currentAdress, currentMemoryContent);
-			currentAdress++;
+			else{
+				processor.getMainMemory().setWord(address, next);
+			}
+			address += 1;
 		}
-
-		/* 
-		3. set the following registers:
-		    x0 = 0
-		    x1 = 65535
-		    x2 = 65535
-		*/
-		processor.getRegisterFile().setValue(0, 0);
-		processor.getRegisterFile().setValue(1, 65535);
-		processor.getRegisterFile().setValue(2, 65535);
+        
+        processor.getRegisterFile().setValue(0, 0);
+        processor.getRegisterFile().setValue(1, 65535);
+        processor.getRegisterFile().setValue(2, 65535);
+        
+        //System.out.println(processor.getRegisterFile().getProgramCounter());
+        //String output = processor.getMainMemory().getContentsAsString(0, 15);
+        //System.out.println(output);
 	}
-	
-	public static void simulate()
-	{
-		while(simulationComplete == false)
-		{
+			
+	public static void simulate(){
+		while(simulationComplete == false){
 			processor.getIFUnit().performIF();
 			Clock.incrementClock();
 			processor.getOFUnit().performOF();
@@ -82,18 +82,15 @@ public class Simulator {
 			processor.getRWUnit().performRW();
 			Clock.incrementClock();
 
-			/*
-				After processing one instruction completely through all the five units, one cycle is completed.
-			*/
-
-			/* Set statistics */
-			Statistics.setNumberOfCycles(Statistics.getNumberOfCycles() + 1);
 			Statistics.setNumberOfInstructions(Statistics.getNumberOfInstructions() + 1);
-		}	
+			Statistics.setNumberOfCycles(Statistics.getNumberOfCycles() + 1);
+		}
+		
+		// TODO
+		// set statistics
 	}
 	
-	public static void setSimulationComplete(boolean value)
-	{
+	public static void setSimulationComplete(boolean value){
 		simulationComplete = value;
 	}
 }

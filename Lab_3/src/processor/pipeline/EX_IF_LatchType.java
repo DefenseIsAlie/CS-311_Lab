@@ -2,27 +2,28 @@ package processor.pipeline;
 
 public class EX_IF_LatchType {
 
-	boolean isBranchEnable;
+	boolean IS_enable;
 	int PC;
 	
 	public EX_IF_LatchType(){
-		isBranchEnable = false;
+		IS_enable = false;
 	}
 
-	// getter and setter of isBranchEnable
-	public boolean getIsBranchEnable() {
-		return isBranchEnable;
+	public boolean getIS_enable() {
+		return IS_enable;
 	}
-	public void setIsBranchEnable(boolean isBranchEnable) {
-		this.isBranchEnable = isBranchEnable;
+
+	public void setIS_enable(boolean iS_enable, int newPC) {
+		IS_enable = iS_enable;
+		PC = newPC;
 	}
-	
-	// getter and setter for PC
+
+	public void setIS_enable(boolean iS_enable) {
+		IS_enable = iS_enable;
+	}
+
 	public int getPC() {
 		return PC;
 	}
-	public void setPC(int PC) {
-		this.PC = PC;
-	}
-
+	
 }
