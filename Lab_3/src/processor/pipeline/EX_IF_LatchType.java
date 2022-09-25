@@ -2,26 +2,28 @@ package processor.pipeline;
 
 public class EX_IF_LatchType {
 
-	boolean isEnable;
+	boolean IS_enable;
 	int PC;
 	
-	// constructor for class EX_IF_LatchType
 	public EX_IF_LatchType(){
-		this.isEnable = false;
+		IS_enable = false;
 	}
 
-	// getter and setter for isEnable and PC
 	public boolean getIS_enable() {
-		return this.isEnable;
+		return IS_enable;
 	}
-	public void setIS_enable(boolean isEnable, int PC) {
-		this.isEnable = isEnable;
-		this.PC = PC;
+
+	public void setIS_enable(boolean iS_enable, int newPC) {
+		IS_enable = iS_enable;
+		PC = newPC;
 	}
-	public void setIS_enable(boolean isEnable) {
-		this.isEnable = isEnable;
+
+	public void setIS_enable(boolean iS_enable) {
+		IS_enable = iS_enable;
 	}
+
 	public int getPC() {
 		return PC;
 	}
+	
 }

@@ -5,8 +5,7 @@ public class IF_OF_LatchType {
 	boolean OF_enable;
 	int instruction;
 	
-	public IF_OF_LatchType()
-	{
+	public IF_OF_LatchType(){
 		OF_enable = false;
 	}
 

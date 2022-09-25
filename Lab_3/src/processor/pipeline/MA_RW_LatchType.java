@@ -5,44 +5,44 @@ import generic.Instruction;
 public class MA_RW_LatchType {
 	
 	boolean RW_enable;
-	Instruction I;
-	int ALU_result;
-	int loadResult;
-
-	public MA_RW_LatchType()
-	{
-		this.RW_enable = false;
+	Instruction instruction;
+	int load_result;
+	int alu_result;
+	
+	public MA_RW_LatchType(){
+		RW_enable = false;
 	}
 
-	// getter and setter for isRW_enable
 	public boolean isRW_enable() {
-		return this.RW_enable;
-	}
-	public void setRW_enable(boolean RW_enable) {
-		this.RW_enable = RW_enable;
+		return RW_enable;
 	}
 
-	// getter and setter for the object of class Instruction
+	public void setRW_enable(boolean rW_enable) {
+		RW_enable = rW_enable;
+	}
+
 	public Instruction getInstruction() {
-		return this.I;
-	}
-	public void setInstruction(Instruction I) {
-		this.I = I;
+		return instruction;
 	}
 
-	// getter and setter for the ALU_result variable
+	public void setInstruction(Instruction inst) {
+		instruction = inst;
+	}
+
+	public void setLoad_result(int result) {
+		load_result = result;
+	}
+
+	public int getLoad_result() {
+		return load_result;
+	}
+
 	public int getALU_result() {
-		return this.ALU_result;
-	}
-	public void setALU_result(int ALU_result) {
-		this.ALU_result = ALU_result;
+		return alu_result;
 	}
 
-	// getter and setter for the loadResult variable
-	public int getLoadResult() {
-		return this.loadResult;
+	public void setALU_result(int result) {
+		alu_result = result;
 	}
-	public void setLoadResult(int loadResult) {
-		this.loadResult = loadResult;
-	}
+
 }

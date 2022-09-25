@@ -32,8 +32,7 @@ public class Processor {
 	MemoryAccess MAUnit;
 	RegisterWrite RWUnit;
 	
-	public Processor()
-	{
+	public Processor(){
 		registerFile = new RegisterFile();
 		mainMemory = new MainMemory();
 		
@@ -51,8 +50,7 @@ public class Processor {
 		RWUnit = new RegisterWrite(this, MA_RW_Latch, IF_EnableLatch);
 	}
 	
-	public void printState(int memoryStartingAddress, int memoryEndingAddress)
-	{
+	public void printState(int memoryStartingAddress, int memoryEndingAddress){
 		System.out.println(registerFile.getContentsAsString());
 		
 		System.out.println(mainMemory.getContentsAsString(memoryStartingAddress, memoryEndingAddress));		

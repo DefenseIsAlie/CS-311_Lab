@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import generic.Instruction;
 import generic.Instruction.OperationType;
+import generic.Operand;
 import generic.Operand.OperandType;
 
 public class Execute {
