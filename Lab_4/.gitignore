@@ -1,0 +1,7 @@
+jars/**
+
+bin/**
+
+*.class
+
+*.out
