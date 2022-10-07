@@ -6,14 +6,9 @@ public class IF_OF_LatchType {
 	int I; // instruction
 
 	/* need to check this part once again */
-	public void if_of_latchtype(boolean of_enable) {
-		of_enable = of_enable;
-	}
-	public void if_of_latchtype(boolean of_enable, int I) {
-		of_enable = of_enable;
-		this.I = I;
-	}
-	public void IF_OF_LatchType() {
+	
+	// constructor
+	public IF_OF_LatchType() {
 		OF_enable = false;
 	}
 
