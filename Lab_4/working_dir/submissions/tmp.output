@@ -1,0 +1,21 @@
+Buildfile: /home/karthikjp/Documents/V SEM/Computer Architecture/CS-311_Lab/Lab_4/working_dir/submissions/build.xml
+
+build-subprojects:
+
+init:
+    [mkdir] Created dir: /home/karthikjp/Documents/V SEM/Computer Architecture/CS-311_Lab/Lab_4/working_dir/submissions/bin
+     [copy] Copying 2 files to /home/karthikjp/Documents/V SEM/Computer Architecture/CS-311_Lab/Lab_4/working_dir/submissions/bin
+
+build-project:
+    [javac] Compiling 22 source files to /home/karthikjp/Documents/V SEM/Computer Architecture/CS-311_Lab/Lab_4/working_dir/submissions/bin
+    [javac] warning: [options] bootstrap class path not set in conjunction with -source 8
+    [javac] 1 warning
+
+build:
+
+make-jar:
+    [mkdir] Created dir: /home/karthikjp/Documents/V SEM/Computer Architecture/CS-311_Lab/Lab_4/working_dir/submissions/jars
+      [jar] Building jar: /home/karthikjp/Documents/V SEM/Computer Architecture/CS-311_Lab/Lab_4/working_dir/submissions/jars/simulator.jar
+
+BUILD SUCCESSFUL
+Total time: 1 second
