@@ -1,0 +1,78 @@
+package generic;
+import java.io.*;
+import processor.Clock;
+import processor.Processor;
+
+public class Simulator {
+		
+	static Processor processor;
+	static boolean simulationComplete;
+	static int cycle=0;
+	static EventQueue eventQueue;
+	 
+	public static void setupSimulation(String assemblyProgramFile, Processor p) throws IOException {
+		Simulator.processor = p;
+		loadProgram(assemblyProgramFile);
+		eventQueue = new EventQueue();
+		simulationComplete = false;
+	}
+	
+	static void loadProgram(String assemblyProgramFile) throws IOException
+	{
+		/*
+		 * TODO
+		 * 1. load the program into memory according to the program layout described
+		 *    in the ISA specification
+		 * 2. set PC to the address of the first instruction in the main
+		 * 3. set the following registers:
+		 *     x0 = 0
+		 *     x1 = 65535
+		 *     x2 = 65535
+		 */
+		try{
+			int memoryIdx=0;
+			DataInputStream dataIP = new DataInputStream(new FileInputStream(assemblyProgramFile)) ;
+			
+			// first read is to set the program counter
+			processor.getRegisterFile().setProgramCounter(dataIP.readInt());
+			
+			while (dataIP.available() > 0) {				
+				processor.getMainMemory().setWord(memoryIdx,dataIP.readInt());
+				memoryIdx++ ;	
+			}
+
+			// as described in TODO
+			processor.getMainMemory().getContentsAsString(0, 10);
+			processor.getRegisterFile().setValue(0,0);
+			processor.getRegisterFile().setValue(1,65535);
+			processor.getRegisterFile().setValue(2,65535);
+			dataIP.close();	
+		}
+    	catch(FileNotFoundException e){
+    		System.out.println("Cannot Open the Input File");
+    		return;
+    	}
+	}
+
+	public static EventQueue getEventQueue() {
+		return eventQueue;
+	}
+	
+	public static void simulate() {
+		while(simulationComplete == false) {
+			Clock.incrementClock();
+			processor.getRWUnit().performRW();
+			processor.getMAUnit().performMA();
+			processor.getEXUnit().performEX();
+			eventQueue.processEvents();
+			processor.getOFUnit().performOF();
+			processor.getIFUnit().performIF();
+			cycle++;
+		}
+		// set statistics
+		Statistics.setNumberOfCycles(cycle);
+	}
+	public static void setSimulationComplete(boolean value) {
+		simulationComplete = value;
+	}
+}
