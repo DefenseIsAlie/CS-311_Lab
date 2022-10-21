@@ -1,0 +1,3 @@
+# cycles : 1174
+# data hazards : 0
+# control hazards : 5
