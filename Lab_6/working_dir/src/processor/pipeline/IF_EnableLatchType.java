@@ -10,8 +10,11 @@ public class IF_EnableLatchType {
 		isBusy = false;
 	}
 
-	public boolean checkBusy() {
-		return isBusy;
+	public boolean getIsBusy() {
+		return this.isBusy;
+	}
+	public void setIsBusy(boolean isBusy) {
+		this.isBusy = isBusy;
 	}
 
 	public boolean isIF_enable() {

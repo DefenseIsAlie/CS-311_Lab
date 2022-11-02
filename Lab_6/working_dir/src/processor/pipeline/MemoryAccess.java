@@ -11,96 +11,94 @@ public class MemoryAccess implements Element{
 	Processor containingProcessor;
 	EX_MA_LatchType EX_MA_Latch;
 	MA_RW_LatchType MA_RW_Latch;
-	Cache cache;
+	Cache CACHE;
 	
-	public MemoryAccess(Processor containingProcessor, EX_MA_LatchType eX_MA_Latch, MA_RW_LatchType mA_RW_Latch, Cache cach)
+	public MemoryAccess(Processor containingProcessor, EX_MA_LatchType eX_MA_Latch, MA_RW_LatchType mA_RW_Latch, Cache CACHE)
 	{
 		this.containingProcessor = containingProcessor;
 		this.EX_MA_Latch = eX_MA_Latch;
 		this.MA_RW_Latch = mA_RW_Latch;
-		this.cache = cach;
+		this.CACHE = CACHE;
 	}
 	
 	public void performMA()
 	{
-		// if(EX_MA_Latch.MA_enable == false) MA_RW_Latch.RW_enable = false;
-		if(EX_MA_Latch.isMA_enable() && EX_MA_Latch.isBusy == false) {
-			if(EX_MA_Latch.isNop == true) {
-				MA_RW_Latch.isNop = true;
-				MA_RW_Latch.rd = 75000;
-			}
-			else {
-				MA_RW_Latch.isNop = false;
-				int aluResult = EX_MA_Latch.aluResult;
-				int rs1 = EX_MA_Latch.rs1;
-				int rs2 = EX_MA_Latch.rs2;
-				int rd = EX_MA_Latch.rd;
-				int imm = EX_MA_Latch.imm;
-				String opcode = EX_MA_Latch.opcode;
+		boolean performingCondition = EX_MA_Latch.isMA_enable() && !EX_MA_Latch.getIsBusy();
+		
+		if(performingCondition) {
+			
+			if (EX_MA_Latch.getIsNOP()) {
+				
+				MA_RW_Latch.setIsNOP(true);
+				MA_RW_Latch.setRD(75000);
 
-				MA_RW_Latch.insPC = EX_MA_Latch.insPC;
-				System.out.println("MA\t" + EX_MA_Latch.insPC + "\trs1:" + rs1 + "\trs2:" + rs2 + "\trd:" + rd + "\timm:" + imm + "\talu:" + aluResult);
+			} else {
 
-				MA_RW_Latch.aluResult = aluResult;
-				MA_RW_Latch.rs1 = rs1;
-				MA_RW_Latch.rs2 = rs2;
-				MA_RW_Latch.rd = rd;
-				MA_RW_Latch.imm = imm;
-				MA_RW_Latch.opcode = opcode;
+				MA_RW_Latch.setIsNOP(false);
 
-				// if(Simulator.storeresp + Configuration.mainMemoryLatency >= Clock.getCurrentTime()) EX_MA_Latch.isBusy = false;
+				int aluResult = EX_MA_Latch.getALUresult();
+				int rs1 = EX_MA_Latch.getRS1();
+				int rs2 = EX_MA_Latch.getRS2();
+				int rd = EX_MA_Latch.getRD();
+				int imm = EX_MA_Latch.getIMM();
+				String opcode = EX_MA_Latch.getOPcode();
 
-				if(opcode.equals("10110")) { //load
-					MA_RW_Latch.isLoad = true;
-					EX_MA_Latch.isBusy = true;
-					Simulator.getEventQueue().addEvent(
-						new MemoryReadEvent(
-							Clock.getCurrentTime(), 
-							this, 
-							this.cache, aluResult)
-					);
+				MA_RW_Latch.setPC(EX_MA_Latch.getPC());
+				MA_RW_Latch.setALUresult(aluResult);
+				MA_RW_Latch.setRS1(rs1);
+				MA_RW_Latch.setRS2(rs2);
+				MA_RW_Latch.setRD(rd);
+				MA_RW_Latch.setIMM(imm);
+				MA_RW_Latch.setOPcode(opcode);
+	
+				if(opcode.equals("10110")) { // load instruction
+					
+					MA_RW_Latch.setIsLoad(true);
+					EX_MA_Latch.setIsBusy(true);
+					
+					MemoryReadEvent MEM_EVENT = new MemoryReadEvent(Clock.getCurrentTime() + this.CACHE.latency, this, this.CACHE, aluResult);
+					Simulator.getEventQueue().addEvent(MEM_EVENT);
+
 					EX_MA_Latch.setMA_enable(false);
 					return;
-					// aluResult = containingProcessor.getMainMemory().getWord(aluResult);
 				}
-				if(opcode.equals("10111")) {  //store
-					EX_MA_Latch.isBusy = true;
+
+				if(opcode.equals("10111")) {  //store instruction
+					EX_MA_Latch.setIsBusy(true);
+					
 					Simulator.storeresp = Clock.getCurrentTime();
-					Simulator.getEventQueue().addEvent(
-						new MemoryWriteEvent(
-							Clock.getCurrentTime()+this.cache.latency, 
-							this, 
-							this.cache, 
-							aluResult, 
-							rs1)
-					);
+					MemoryWriteEvent MEM_WRITE_EVENT = new MemoryWriteEvent(Clock.getCurrentTime() + this.CACHE.latency, this, this.CACHE, aluResult, rs1);
+					Simulator.getEventQueue().addEvent(MEM_WRITE_EVENT);
+					
 					EX_MA_Latch.setMA_enable(false);
 					return;
-
 				}
 			}
+
 			EX_MA_Latch.setMA_enable(false);
-			if(EX_MA_Latch.opcode.equals("11101") == true ) {
-				EX_MA_Latch.setMA_enable(false);
+			
+			if(EX_MA_Latch.getOPcode().equals("11101") == true ) {
+				EX_MA_Latch.setMA_enable(false); // end instruction
 			}
+
 			MA_RW_Latch.setRW_enable(true);
 		}
-		//TODO
 	}
 
 	@Override
-	public void handleEvent(Event e) {
-		if(e.getEventType() == EventType.MemoryResponse) {
-			MemoryResponseEvent event = (MemoryResponseEvent) e ; 
-			MA_RW_Latch.aluResult = event.getValue();
-			MA_RW_Latch.insPC = EX_MA_Latch.insPC;
+	public void handleEvent(Event EVENT) {
+		if(EVENT.getEventType() == EventType.MemoryResponse) {
+			MemoryResponseEvent event = (MemoryResponseEvent) EVENT ; 
+			
+			MA_RW_Latch.setALUresult(event.getValue());
+			MA_RW_Latch.setPC(EX_MA_Latch.getPC());
+			EX_MA_Latch.setIsBusy(false);
 			MA_RW_Latch.setRW_enable(true);
 			EX_MA_Latch.isBusy = false;
+		
 		}
 		else {
-			EX_MA_Latch.isBusy = false;
+			EX_MA_Latch.setIsBusy(false);
 		}
-
 	}
-
 }

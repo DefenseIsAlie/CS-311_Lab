@@ -17,6 +17,14 @@ public class Simulator {
 	public static long storeresp;
 	public static int ins_count;
 	
+	public static int getInstructionCount() {
+		return ins_count;
+	}
+
+	public static void setInstructionCount(int ins_count) {
+		ins_count = ins_count;
+	}
+
 	public static void setupSimulation(String assemblyProgramFile, Processor p) throws FileNotFoundException
 	{
 		eventQueue = new EventQueue();

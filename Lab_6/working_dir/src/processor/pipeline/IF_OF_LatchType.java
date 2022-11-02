@@ -4,27 +4,30 @@ public class IF_OF_LatchType {
 	
 	boolean OF_enable;
 	int I;
-	int insPC;
+	int PC;
 	boolean isBusy;
 	
+	// constructor
 	public IF_OF_LatchType() {
 		OF_enable = false;
-		insPC = -1;
+		PC = -1;
 		I = -1999;
 		isBusy = false;
 	}
+	
+	// parametrized constructor
 	public IF_OF_LatchType(boolean oF_enable, boolean isBusy) {
 		OF_enable = oF_enable;
-		insPC = -1;
+		PC = -1;
 		I = -1999;
 		this.isBusy = isBusy;
 	}
 
 	public int getPC() {
-		return this.insPC;
+		return this.PC;
 	}
 	public void setPC(int PC) {
-		this.insPC = PC;
+		this.PC = PC;
 	}
 
 	public boolean isOF_enable() {
@@ -38,7 +41,7 @@ public class IF_OF_LatchType {
 		return this.I == I;
 	}
 	public boolean checkPC(int PC) {
-		return this.insPC == PC;
+		return this.PC == PC;
 	}
 
 	public int getInstruction() {
@@ -46,5 +49,12 @@ public class IF_OF_LatchType {
 	}
 	public void setInstruction(int I) {
 		this.I = I;
+	}
+
+	public boolean getIsBusy() {
+		return this.isBusy;
+	}
+	public void setIsBusy(boolean isBusy) {
+		this.isBusy = isBusy;
 	}
 }

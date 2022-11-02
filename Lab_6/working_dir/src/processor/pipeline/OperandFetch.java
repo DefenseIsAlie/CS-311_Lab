@@ -21,10 +21,11 @@ public class OperandFetch {
 		this.IF_EnableLatch = iF_EnableLatch;
 	}
 
+// helper functions
+
 	public static char bitComplement(char c) {
 		return (c == '0') ? '1' : '0';
 	}
-
 	public static String twosComplement(String bin) {
 		String TWO = "", ONE = ""; // ones and twos complement respectively
 		// taking ones complement
@@ -50,12 +51,10 @@ public class OperandFetch {
         TWO = B.toString();
         return TWO;
 	}
-
-	private static String toBinaryOfSpecificPrecision(int num, int lenOfTargetString) {
-		String binary = String.format("%" + lenOfTargetString + "s", Integer.toBinaryString(num)).replace(' ', '0');
+	private static String toBinaryOfSpecificPrecision(int num, int targetLength) {
+		String binary = String.format("%" + targetLength + "s", Integer.toBinaryString(num)).replace(' ', '0');
 		return binary;
 	}
-	
 	private static int toSignedInteger(String binary) {
 		int n = 32 - binary.length();
         char[] sign_ext = new char[n];
@@ -63,115 +62,118 @@ public class OperandFetch {
         int signedInteger = (int) Long.parseLong(new String(sign_ext) + binary, 2);
         return signedInteger;
 	}
-
 	private void loopAround(int num) {
 		for (int i = 0; i < num; i += 1)
 			toSignedInteger(toBinaryOfSpecificPrecision(i, 20));
 	}
 	
-	public void performOF()
-	{
-		if (OF_EX_Latch.isBusy) {
-			IF_OF_Latch.isBusy = true;
+	public void performOF() {
+
+		if (OF_EX_Latch.getIsBusy()) {
+			IF_OF_Latch.setIsBusy(true); // stall the pipeline
 			return;
 		} else {
-			IF_OF_Latch.isBusy = false;
+			IF_OF_Latch.setIsBusy(false);
 		}
 
-		if(IF_OF_Latch.isOF_enable() && OF_EX_Latch.isBusy == false)
-		{
+		if(IF_OF_Latch.isOF_enable()) {
+			
 			String I_STR = Integer.toBinaryString(IF_OF_Latch.getInstruction());
+			
 			if(IF_OF_Latch.getInstruction() < 0) {
 				while(I_STR.length() < 32) {
 					I_STR = "1" + I_STR;
 				}
-			}
-			else {
+			} else {
 				while(I_STR.length() < 32) {
 					I_STR = "0" + I_STR;
 				}
 			}
 			
-			int opcode,rs1,rs2,rd,imm;
-			int rs1addr,rs2addr;
+			int OPCODE;
+			int rd;
+			int rs1;
+			int rs2;
+			int IMM;
+			int rs1Address,rs2Address;
+
 			String op = I_STR.substring(0, 5);
-			opcode = Integer.parseInt(op,2);
+			OPCODE = Integer.parseInt(op,2);
+
 			rs1 = 70000;
 			rs2 = 70000;
-			rd = 70000;
-			imm = 70000;
-			rs1addr = 45;
-			rs2addr = 45;
-			if(opcode == 0) {
-				rs1addr = Integer.parseInt(I_STR.substring(5, 10),2);
-				rs2addr = Integer.parseInt(I_STR.substring(10, 15),2);
-				rs1 = containingProcessor.getRegisterFile().getValue(rs1addr);
-				rs2 = containingProcessor.getRegisterFile().getValue(rs2addr);
+			rd  = 70000;
+			IMM = 70000;
+
+			rs1Address = 45;
+			rs2Address = 45;
+
+			if (OPCODE == 0) {
+				rs1Address = Integer.parseInt(I_STR.substring(5, 10),2);
+				rs2Address = Integer.parseInt(I_STR.substring(10, 15),2);
+				rs1 = containingProcessor.getRegisterFile().getValue(rs1Address);
+				rs2 = containingProcessor.getRegisterFile().getValue(rs2Address);
 				rd = Integer.parseInt(I_STR.substring(15, 20),2);
-				imm = 70000;
-			}
-			else if(0 < opcode && opcode < 22) {
-				if(opcode % 2 == 0) {
-					rs1addr = Integer.parseInt(I_STR.substring(5, 10),2);
-					rs2addr = Integer.parseInt(I_STR.substring(10, 15),2);
-					rs1 = containingProcessor.getRegisterFile().getValue(rs1addr);
-					rs2 = containingProcessor.getRegisterFile().getValue(rs2addr);
+				IMM = 70000;
+			} else if (0 < OPCODE && OPCODE < 22) {
+				if(OPCODE % 2 == 0) {
+					rs1Address = Integer.parseInt(I_STR.substring(5, 10),2);
+					rs2Address = Integer.parseInt(I_STR.substring(10, 15),2);
+					rs1 = containingProcessor.getRegisterFile().getValue(rs1Address);
+					rs2 = containingProcessor.getRegisterFile().getValue(rs2Address);
 					rd = Integer.parseInt(I_STR.substring(15, 20),2);
-					imm = 70000;
-				}
-				else {
-					rs1addr = Integer.parseInt(I_STR.substring(5, 10),2);
-					rs1 = containingProcessor.getRegisterFile().getValue(rs1addr);
+					IMM = 70000;
+				} else {
+					rs1Address = Integer.parseInt(I_STR.substring(5, 10),2);
+					rs1 = containingProcessor.getRegisterFile().getValue(rs1Address);
 					rs2 = 70000;
 					rd = Integer.parseInt(I_STR.substring(10, 15),2);
-					imm = Integer.parseInt(I_STR.substring(15, 32),2);
+					IMM = Integer.parseInt(I_STR.substring(15, 32),2);
 				}
-			}
-			else {
-				if(opcode == 24) {
+			} else {
+				if(OPCODE == 24) {
 					rs1 = 70000;
 					rs2 = 70000;
 					rd = Integer.parseInt(I_STR.substring(5, 10),2);
-					imm = Integer.parseInt(I_STR.substring(10, 32),2);
+					IMM = Integer.parseInt(I_STR.substring(10, 32),2);
 					if(I_STR.substring(10, 32).charAt(0) == '1') {
-						imm = imm - 4194304;
+						IMM = IMM - 4194304;
 					}
 				}
-				else if(opcode != 29) {
-					rs1addr = Integer.parseInt(I_STR.substring(5, 10),2);
-					rs1 = containingProcessor.getRegisterFile().getValue(rs1addr);
+				else if(OPCODE != 29) {
+					rs1Address = Integer.parseInt(I_STR.substring(5, 10),2);
+					rs1 = containingProcessor.getRegisterFile().getValue(rs1Address);
 					rs2 = 70000;
 					rd = Integer.parseInt(I_STR.substring(10, 15),2);
-					imm = Integer.parseInt(I_STR.substring(15, 32),2);
+					IMM = Integer.parseInt(I_STR.substring(15, 32),2);
 					if(I_STR.substring(15, 32).charAt(0) == '1') {
-						imm = imm - 131072;
+						IMM = IMM - 131072;
 					}
 				}
 				else {
 					rs1 = 70000;
 					rs2 = 70000;
 					rd = 70000;
-					imm = 70000;
+					IMM = 70000;
 				}
 			}
-			int rdEX = OF_EX_Latch.rd;
-			int rdMA = EX_MA_Latch.rd;
-			int rdRW = MA_RW_Latch.rd;
-			
-			OF_EX_Latch.isNop = false;
-			OF_EX_Latch.opcode = op;
-			OF_EX_Latch.rs1 = rs1;
-			OF_EX_Latch.rs2 = rs2;
-			OF_EX_Latch.rd = rd;
-			OF_EX_Latch.imm = imm;
-			OF_EX_Latch.insPC = IF_OF_Latch.insPC;
+
+			OF_EX_Latch.setIsNOP(false);
+			OF_EX_Latch.setOPcode(op);
+			OF_EX_Latch.setRS1(rs1);
+			OF_EX_Latch.setRS2(rs2);
+			OF_EX_Latch.setRD(rd);
+			OF_EX_Latch.setIMM(IMM);
+			OF_EX_Latch.setPC(IF_OF_Latch.getPC());
 			OF_EX_Latch.setEX_enable(true);
+
 			IF_EnableLatch.setIF_enable(true);
 		
-			if(opcode == 29) {
+			if(OPCODE == 29) { // end instruction
 				IF_OF_Latch.setOF_enable(false);
 				IF_EnableLatch.setIF_enable(false);
 			}
+
 			IF_OF_Latch.setOF_enable(false);
 			OF_EX_Latch.setEX_enable(true);
 		}
