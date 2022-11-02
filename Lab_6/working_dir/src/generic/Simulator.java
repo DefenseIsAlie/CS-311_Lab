@@ -24,47 +24,47 @@ public class Simulator {
 		ins_count = 0;
 		Simulator.processor = p;
 		loadProgram(assemblyProgramFile);
-		
 		simulationComplete = false;
 	}
 	
 	static void loadProgram(String assemblyProgramFile) throws FileNotFoundException {
-		/*
-		 * TODO
-		 * 1. load the program into memory according to the program layout described
-		 *    in the ISA specification
-		 * 2. set PC to the address of the first instruction in the main
-		 * 3. set the following registers:
-		 *     x0 = 0
-		 *     x1 = 65535
-		 *     x2 = 65535
-		 */
+
+			/*
+			* TODO
+			* 1. load the program into memory according to the program layout described
+			*    in the ISA specification
+			* 2. set PC to the address of the first instruction in the main
+			* 3. set the following registers:
+			*     x0 = 0
+			*     x1 = 65535
+			*     x2 = 65535
+			*/
 		 
-		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(assemblyProgramFile)));
+		DataInputStream BIN_IP = new DataInputStream(new BufferedInputStream(new FileInputStream(assemblyProgramFile)));
 		
 		try{
-			int n = dis.readInt();
-			int i;
-			for(i=0;i<n;i++){
-				int temp = dis.readInt();
-				processor.getMainMemory().setWord(i,temp);
-			}
-			
-			int pc = i;
-			int offset = 1;
-			processor.getRegisterFile().setProgramCounter(pc);
+			int N = BIN_IP.readInt();
+			int idx = 0;
 
-			while(dis.available()>0){
-				int temp = dis.readInt();
-				processor.getMainMemory().setWord(i,temp);
-				i += offset;
+			for(; idx < N; idx++){
+				int data = BIN_IP.readInt();
+				processor.getMainMemory().setWord(idx,data);
 			}
 			
-			processor.getRegisterFile().setValue(0,0);
+			int PC = idx;
+			int offSet = 1;
+			processor.getRegisterFile().setProgramCounter(PC);
+
+			while(BIN_IP.available()>0){
+				int data = BIN_IP.readInt();
+				processor.getMainMemory().setWord(idx,data);
+				idx += offSet;
+			}
+			
 			processor.getRegisterFile().setValue(1,65535);
 			processor.getRegisterFile().setValue(2,65535);
-
-			dis.close();
+			processor.getRegisterFile().setValue(0,0);		
+			BIN_IP.close();
 		}
 		catch(Exception e){
 			e.printStackTrace();
