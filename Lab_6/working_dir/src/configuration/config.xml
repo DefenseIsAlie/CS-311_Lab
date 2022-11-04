@@ -19,16 +19,16 @@
 	</FunctionalUnits>
 	
 	<L1iCache>
-		<NumberOfLines>256</NumberOfLines>
+		<NumberOfLines>16</NumberOfLines>
 		<Latency>2</Latency>
-		<Associativity>4</Associativity>
+		<Associativity>2</Associativity>
 		<ReplacementPolicy>LRU</ReplacementPolicy>
 	</L1iCache>
 	
 	<L1dCache>
 		<NumberOfLines>256</NumberOfLines>
 		<Latency>2</Latency>
-		<Associativity>4</Associativity>
+		<Associativity>2</Associativity>
 		<ReplacementPolicy>LRU</ReplacementPolicy>
 	</L1dCache>
 	
